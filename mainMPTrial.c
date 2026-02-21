@@ -27,6 +27,8 @@ int main()
     {"TheLegend27", "John1000Dragonball", "Maladroit64", "Pandaman", "Andre3000",
      "KillerQueen", "KillerBee", "Niki"};
     menu(Players, MAX_PLAYER_ROWS, MAX_PLAYER_CHAR);
+    printf("Hello world!");
     return 0;
 }
+
 
