@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "defs.h"
+//#include "mp-mantis-starter-files/Essentials/defs.h"
 
 /******************************************************************************
  * NOTE: These functions are placed here in helpers_1.c to demonstrate code
@@ -37,4 +37,22 @@ void displayCoodinates(Coordinate points[], int arrSize)
   printf("\n\n");
 }
 
+
+
+int numInput()
+{
+    char storage[5];
+    int choice;
+
+    printf("Enter choice: ");
+    fgets(storage, sizeof(storage), stdin);
+
+    choice = atoi(storage);
+    return choice;
+}
+
+void strInput(char buffer[], int size)
+{
+    fgets(buffer, size, stdin);
+}
 #endif // HELPERS_1_C; Include this to prevent redefinition error
