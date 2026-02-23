@@ -3,7 +3,7 @@
  *  Author/s        : Agamata, Loraine 
  *                    Lapuz, Dale Lucian M.
  *  Section         : 
- *  Last Modified   : Feb 18, 2026
+ *  Last Modified   : Feb 23, 2026
  *  Acknowledgments : <list of references used in the making of this project>
  ******************************************************************************/
 
@@ -30,4 +30,5 @@ int main()
     menu(Players, MAX_PLAYER_ROWS, MAX_PLAYER_CHAR, Seed, defaultPoints);
     return 0;
 }
+
 
