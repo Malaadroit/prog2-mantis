@@ -1,6 +1,6 @@
 /******************************************************************************
  *  Description     : main menu file chuchu
- *  Author/s        : Agamata, Loraine 
+ *  Author/s        : Agamata, Loraine Beatriz C.
  *                    Lapuz, Dale Lucian M.
  *  Section         : 
  *  Last Modified   : Feb 23, 2026
@@ -15,19 +15,38 @@
 /* ----- definitions (i.e., constants, typedefs, structs) ----- */
 #define MAX_PLAYER_CHAR 37
 #define MAX_PLAYER_ROWS 50
+#define WINNING_SCORE 20
 typedef char String36[MAX_PLAYER_CHAR];
 
+typedef struct {
+   // char username[] i commented it out first since were approaching players as arrays instead of input redirection
+    int wins;
+    int highScore;
+    int currentScore;
+    int tank[7];
+} Player;
+
+typedef struct {
+    int winningPts;
+    int shufflingSpeed; //idk if it should be int
+} GameSettings;
+
+typedef struct {
+    char back[4];
+    char front;
+    int points;
+} Card;
 
 /* ----- function prototypes ----- */
-void menu(char Playerlist[][37], int rows, int columns, int seed, int points);
+void menu(char Playerlist[][37], int rows, int columns, GameSettings *settings);
 void displayMainMenu();
 void topDesign();
 void newGame(String36 List[], int rows, int columns);
-void statisticsMenu(char Playerlist[][37], int rows, int columns, int seed, int points);
-void settingsMenu(char Playerlist[][37], int rows, int columns, int* seed, int* points);
+void statisticsMenu(char Playerlist[][37], int rows, int columns);
+void settingsMenu(GameSettings *settings);
 
 /* ----- code proper ----- */
-void menu(char Playerlist[][37], int rows, int columns, int seed, int points)
+void menu(char Playerlist[][37], int rows, int columns, GameSettings *settings)
 {
     int checkContinue = 1;
     int choice = -100;
@@ -47,12 +66,12 @@ void menu(char Playerlist[][37], int rows, int columns, int seed, int points)
 
             case 2:
                 system("cls");
-                statisticsMenu(Playerlist, rows, columns, seed, points);
+                statisticsMenu(Playerlist, rows, columns);
                 break;
 
             case 3:
                 system("cls");
-                settingsMenu(Playerlist, rows, columns, &seed, &points);
+                settingsMenu(settings);
                 break;
 
             case 4:
@@ -113,7 +132,7 @@ void newGame(String36 List[], int rows, int columns)
     }
 }
 
-void statisticsMenu(char Playerlist[][37], int rows, int columns, int seed, int points)
+void statisticsMenu(char Playerlist[][37], int rows, int columns)
 {
     int choice;
     while(!(choice >= 1 && choice <= 3))
@@ -133,15 +152,14 @@ void statisticsMenu(char Playerlist[][37], int rows, int columns, int seed, int 
         case 2:
             break;
         case 3:
-            menu(Playerlist, rows, columns, seed, points);
             break;
     }
 }
 
-void settingsMenu(char Playerlist[][37], int rows, int columns, int* seed, int* points)
+void settingsMenu(GameSettings *settings)
 {
 
-    int choice;
+    int choice = 0;
     while(!(choice >= 1 && choice <= 3))
     {
         topDesign();
@@ -155,12 +173,69 @@ void settingsMenu(char Playerlist[][37], int rows, int columns, int* seed, int* 
     switch(choice)
     {
         case 1:
+        {
+            int yn = 0;
+            printf("The default shuffle speed is normal.\n");
+            printf("Would you like to change the shuffle speed?\n");
+            printf("[1] Yes\n[2] No\n");
+            
+            while(!(yn == 1 || yn == 2))
+                    yn = numInput();
+        
+            if(yn == 1){
+                do{
+                    //printf("Enter new shuffle speed. \n");
+                    settings->shufflingSpeed = numInput();
+                    if(settings->shufflingSpeed <= 0)
+                        printf("Please enter a number above 0. \n");
+                }while(settings->shufflingSpeed <= 0);
+                
+                printf("Your new shuffle speed is: %d\n", settings->shufflingSpeed);
+            }
+
+            else if(choice == 2){
+                settings->shufflingSpeed = 10; //PLACE HOLDER ONLY IDK WHAT "NORMAL" IS
+            }
+            
+            else
+                printf("You have entered a wrong number! Choose from 1 or 2 only. \n");
+            
             break;
+        }
         case 2:
+        {    int yn = 0;
+            printf("The default wiining points is 20.\n");
+            printf("Would you like to change the winning point?\n");
+            printf("[1] Yes\n[2] No\n");
+            
+            
+            while(!(yn == 1 || yn == 2))
+                    yn = numInput();
+
+            if(yn == 1){
+                do
+                {
+                    //printf("Enter new winning point: ");
+                    settings->winningPts = numInput();
+                    if(settings->winningPts <= 0)
+                        printf("Please enter a number above 0. \n");
+                }while(settings->winningPts <= 0);
+                
+
+            printf("Your new shuffle speed is: %d\n", settings->winningPts);
+            }
+
+            else if(choice == 2){
+                settings->winningPts = 20; 
+            }
+            
+            else
+                printf("You have entered a wrong number! Choose from 1 or 2 only. \n");
+            
+        }
             break;
+
         case 3:
-            system("cls");
-            menu(Playerlist, rows, columns, *seed, *points);
             break;
     }
 }

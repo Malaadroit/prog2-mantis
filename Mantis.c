@@ -10,10 +10,10 @@
 /* ----- preprocessor directives ----- */
 #include <stdio.h>
 
-#include "C:/Users/Dale/OneDrive/Desktop/mp-mantis-starter-files/Essentials/defs.h"
-#include "C:/Users/Dale/OneDrive/Desktop/mp-mantis-starter-files/Essentials/helpers/helpers_1.c"
-#include "C:/Users/Dale/OneDrive/Desktop/mp-mantis-starter-files/Essentials/helpers/helpers_2.c"
-#include "C:/Users/Dale/OneDrive/Desktop/mp-mantis-starter-files/Code-Proper/menu.c"
+#include "C:\Users\BESY C. AGAMATA\c coding tut\c files\CCPROG2\MP\mp-github\prog2-mantis\Essentials\defs.h"
+#include "C:\Users\BESY C. AGAMATA\c coding tut\c files\CCPROG2\MP\mp-github\prog2-mantis\Essentials\Helpers\helpers_1.c"
+#include "C:\Users\BESY C. AGAMATA\c coding tut\c files\CCPROG2\MP\mp-github\prog2-mantis\Essentials\Helpers\helpers_2.c"
+#include "C:\Users\BESY C. AGAMATA\c coding tut\c files\CCPROG2\MP\mp-github\prog2-mantis\Code-Proper\menu.c"
 
 /* ----- definitions (i.e., constants, typedefs, structs) ----- */
 
@@ -23,11 +23,12 @@
 
 int main()
 {
+    GameSettings settings;
     int Seed = -999, defaultPoints = 20;
     String36 Players[MAX_PLAYER_ROWS] = 
     {"TheLegend27", "John1000Dragonball", "Maladroit64", "Pandaman", "Andre3000",
      "KillerQueen", "KillerBee", "Niki"};
-    menu(Players, MAX_PLAYER_ROWS, MAX_PLAYER_CHAR, Seed, defaultPoints);
+    menu(Players, MAX_PLAYER_ROWS, MAX_PLAYER_CHAR, &settings);
     return 0;
 }
 
