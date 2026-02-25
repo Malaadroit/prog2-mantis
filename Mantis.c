@@ -10,10 +10,10 @@
 /* ----- preprocessor directives ----- */
 #include <stdio.h>
 
-#include "C:\Users\BESY C. AGAMATA\c coding tut\c files\CCPROG2\MP\mp-github\prog2-mantis\Essentials\defs.h"
-#include "C:\Users\BESY C. AGAMATA\c coding tut\c files\CCPROG2\MP\mp-github\prog2-mantis\Essentials\Helpers\helpers_1.c"
-#include "C:\Users\BESY C. AGAMATA\c coding tut\c files\CCPROG2\MP\mp-github\prog2-mantis\Essentials\Helpers\helpers_2.c"
-#include "C:\Users\BESY C. AGAMATA\c coding tut\c files\CCPROG2\MP\mp-github\prog2-mantis\Code-Proper\menu.c"
+#include "Essentials\defs.h"
+#include "Essentials\helpers\helpers_1.c"
+#include "Essentials\helpers\helpers_2.c"
+#include "Code-Proper\menu.c"
 
 /* ----- definitions (i.e., constants, typedefs, structs) ----- */
 
@@ -31,6 +31,7 @@ int main()
     menu(Players, MAX_PLAYER_ROWS, MAX_PLAYER_CHAR, &settings);
     return 0;
 }
+
 
 
 
