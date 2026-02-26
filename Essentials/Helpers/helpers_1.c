@@ -55,4 +55,5 @@ void strInput(char buffer[], int size)
 {
     fgets(buffer, size, stdin);
 }
+
 #endif // HELPERS_1_C; Include this to prevent redefinition error
