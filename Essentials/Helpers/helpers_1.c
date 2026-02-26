@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-//#include "mp-mantis-starter-files/Essentials/defs.h"
+#include "..\defs.h"
 
 /******************************************************************************
  * NOTE: These functions are placed here in helpers_1.c to demonstrate code
