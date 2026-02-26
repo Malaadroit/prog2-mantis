@@ -19,7 +19,7 @@
 typedef char String36[MAX_PLAYER_CHAR];
 
 typedef struct {
-   // char username[] i commented it out first since were approaching players as arrays instead of input redirection
+    String36 username;
     int wins;
     int highScore;
     int currentScore;
@@ -28,7 +28,7 @@ typedef struct {
 
 typedef struct {
     int winningPts;
-    int shufflingSpeed; //idk if it should be int
+    int shufflingSeed;
 } GameSettings;
 
 typedef struct {
@@ -184,17 +184,17 @@ void settingsMenu(GameSettings *settings)
         
             if(yn == 1){
                 do{
-                    //printf("Enter new shuffle speed. \n");
-                    settings->shufflingSpeed = numInput();
-                    if(settings->shufflingSpeed <= 0)
-                        printf("Please enter a number above 0. \n");
-                }while(settings->shufflingSpeed <= 0);
+                    printf("Enter new shuffle seed. \n");
+                    settings->shufflingSeed = numInput();
+                    if(settings->shufflingSeed < 0)
+                        printf("Please enter a non-negative number. \n");
+                } while(settings->shufflingSeed < 0);
                 
-                printf("Your new shuffle speed is: %d\n", settings->shufflingSpeed);
+                printf("Your new shuffle speed is: %d\n", settings->shufflingSeed);
             }
 
             else if(choice == 2){
-                settings->shufflingSpeed = 10; //PLACE HOLDER ONLY IDK WHAT "NORMAL" IS
+                settings->shufflingSeed = 10; //PLACE HOLDER ONLY IDK WHAT "NORMAL" IS
             }
             
             else

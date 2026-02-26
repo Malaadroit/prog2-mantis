@@ -24,7 +24,7 @@
 int main()
 {
     GameSettings settings;
-    int Seed = -999, defaultPoints = 20;
+    settings.shufflingSeed = randomInt();
     String36 Players[MAX_PLAYER_ROWS] = 
     {"TheLegend27", "John1000Dragonball", "Maladroit64", "Pandaman", "Andre3000",
      "KillerQueen", "KillerBee", "Niki"};
