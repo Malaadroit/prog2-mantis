@@ -11,8 +11,8 @@
 #include <stdio.h>
 
 #include "defs.h"
-#include "helpers_1.c"
-#include "helpers_2.c"
+#include "helpers\helpers_1.c"
+#include "helpers\helpers_2.c"
 
 /* ----- definitions (i.e., constants, typedefs, structs) ----- */
 

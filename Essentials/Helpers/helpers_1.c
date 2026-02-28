@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-//#include "mp-mantis-starter-files/Essentials/defs.h"
+#include "..\defs.h"
 
 /******************************************************************************
  * NOTE: These functions are placed here in helpers_1.c to demonstrate code
@@ -55,4 +55,5 @@ void strInput(char buffer[], int size)
 {
     fgets(buffer, size, stdin);
 }
+
 #endif // HELPERS_1_C; Include this to prevent redefinition error
