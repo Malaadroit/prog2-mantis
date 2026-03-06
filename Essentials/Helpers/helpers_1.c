@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
+#include <string.h>
 #include "..\defs.h"
 
 /******************************************************************************
@@ -46,6 +46,7 @@ int numInput()
 
     printf("Enter choice: ");
     fgets(storage, sizeof(storage), stdin);
+    storage[strcspn(storage, "\n")] = 0;
 
     choice = atoi(storage);
     return choice;
@@ -54,6 +55,7 @@ int numInput()
 void strInput(char buffer[], int size)
 {
     fgets(buffer, size, stdin);
+    buffer[strcspn(buffer, "\n")] = 0;
 }
 
 #endif // HELPERS_1_C; Include this to prevent redefinition error

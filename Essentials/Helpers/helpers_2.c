@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
+#define Seed randomInt()
 /******************************************************************************
  * NOTE: These functions are placed here in helpers_2.c to demonstrate code
  * modularization across multiple files. You may move them to different files
