@@ -1,0 +1,1 @@
+this was renamed in order to create a duplicate which ill be working there forward; creating structs can be messy i feel

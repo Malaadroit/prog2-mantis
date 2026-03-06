@@ -17,10 +17,17 @@
 
 #define PI 3.1415
 #define ARR_SIZE 10
+#define MAX_PLAYER_CHAR 37
+#define MAX_PLAYERS 50
+#define WINNING_SCORE 20
+
 
 /**
  * Represents a 2D point
  */
+typedef char String36[MAX_PLAYER_CHAR];
+typedef char String50[51];
+
 typedef struct
 {
   int x; // The x-coordinate of a point
@@ -36,5 +43,16 @@ typedef struct
   int month; // The integer representation of the month [1-12]
   int year;  // The year
 } Date;
+
+typedef struct {
+    String36 username;
+    int wins;
+    int highScore;
+    int currentScore;
+    int tank[7];
+} Player;
+
+
+
 
 #endif // DEFS_H; Include this to prevent redefinition error
