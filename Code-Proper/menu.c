@@ -14,17 +14,7 @@
 #include "../Essentials/Helpers/helpers_2.c"
 #include "../Essentials/defs.h"
 #include "..\Essentials\Players.c"
-/* ----- definitions (i.e., constants, typedefs, structs) ----- */
-typedef struct {
-    int winningPts;
-    int shufflingSeed;
-} GameSettings;
-
-typedef struct {
-    char back[4];
-    char front;
-    int points;
-} Card;
+#include "../Essentials/GameStructure.c"
 
 /* ----- function prototypes ----- */
 //I. Core
@@ -220,7 +210,7 @@ void newGame(String36 PlayerNames[], Player Playing[], Player PlayerList[], int 
 
 void statisticsMenu(GameSettings settings, Player Playing[], Player PlayerList[], String36 PLNames[], int rows, int columns, int MaxPlrGame)
 {
-    int choice;
+    int choice = 0;
     while(!(choice >= 1 && choice <= 3))
     {
         system("cls");
@@ -282,7 +272,7 @@ void settingsMenu(GameSettings* settings, Player Playing[], Player PlayerList[],
                 printf("Your new shuffle speed is: %d\n", settings->shufflingSeed);
             }
 
-            else if(choice == 2){
+            else if(yn == 2){
                 settings->shufflingSeed = Seed;
             }
             
@@ -348,7 +338,7 @@ void topDesign()
     printf("*~*~*~*~*~*~*~*~*~*~*~*~*~*~*\n");
 }
 
-int checkSameName(Player List[], char Playername[], int MaxPlrGame)
+int checkSameName(GameState List[], char Playername[], int MaxPlrGame)
 {
     int processList, sameName = 0, checker = 0;
 
