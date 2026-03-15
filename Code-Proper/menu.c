@@ -3,7 +3,7 @@
  *  Author/s        : Agamata, Loraine Beatriz C.
  *                    Lapuz, Dale Lucian M.
  *  Section         : 
- *  Last Modified   : Feb 23, 2026
+ *  Last Modified   : March 15, 2026
  *  Acknowledgments : <list of references used in the making of this project>
  ******************************************************************************/
 
@@ -13,21 +13,28 @@
 #include "../Essentials/Helpers/helpers_1.c"
 #include "../Essentials/Helpers/helpers_2.c"
 #include "../Essentials/defs.h"
-#include "..\Essentials\Players.c"
+#include "../Essentials/Players.c"
 #include "../Essentials/GameStructure.c"
+
 
 /* ----- function prototypes ----- */
 //I. Core
-void menu(GameSettings settings, Player Playing[], Player PlayerList[], String36 PLNames[], int rows, int columns, int MaxPlrGame);
-void newGame(String36 PlayerNames[], Player Playing[], Player PlayerList[], int rows, int columns, int MaxPlrGame);
-void statisticsMenu(GameSettings settings, Player Playing[], Player PlayerList[], String36 PLNames[], int rows, int columns, int MaxPlrGame);
-void settingsMenu(GameSettings* settings, Player Playing[], Player PlayerList[], String36 PLNames[], int rows, int columns, int MaxPlrGame);
+void menu(GameSettings *settings, GameData *game);
+void newGame(GameSettings *settings, GameData *game);
+void statisticsMenu(GameSettings *settings, GameData *game);
+void settingsMenu(GameSettings *settings, GameData *game);
+void runGame(GameState Playing[], int numPlayers, GameSettings settings);
 
-//II. Functions in the Core
-void errUser(int sameNamePlay, int sameNamePL, char plrInp[], int* attempted); //occurs in newGame when player does not meet the requirements for username
-void finalPlayers(String36 PL[], Player Playing[], Player PlayerList[], int rows, int columns, int MaxPlrGame, int* players_Playing); //called in newGame after the player creation is done
-void addtoPL(String36 PLName[], int rows, String36 plrname); //called in newGame as the player creates the username.
-int checkSameName(Player Playing[], char Playername[], int MaxPlrGame); //called in newGame to check if there is a same name in the player list.
+// II. Helper Functions for Player Selection
+void selectPlayers(GameState Playing[], Player PlayerList[], String36 PlayerNames[], int *players_Playing);
+void createNewPlayer(Player PlayerList[], String36 PlayerNames[], int max_players, String36 name);
+int findPlayer(Player PlayerList[], int max_players, String36 name);
+int checkSameName(GameState List[], char Playername[], int MaxPlrGame); //GameState stuct to access Player Info
+void errUser(int sameNamePlay, int sameNamePL, char plrInp[], int *attempted);
+void addtoPL(String36 PLName[], int rows, String36 plrname);
+void displayAvailablePlayers(Player PlayerList[], int max_players);
+void finalPlayers(GameSettings *settings, GameData *game, int *confirmed);
+void displayTopPlayers(Player PlayerList[], int max_players, int sortBy);
 
 //III. Extras
 void displayMainMenu();
@@ -36,179 +43,356 @@ void topDesign();
 /* ----- function implementations ----- */
 
 /* I. Core Essentials */
-void menu(GameSettings settings, Player Playing[], Player PlayerList[], String36 PLNames[], int rows, int columns, int MaxPlrGame)
+void menu(GameSettings *settings, GameData *game)
 {
     int checkContinue = 1;
-    int choice = -1, processList;
-    while(!(choice >= 1 && choice <= 5))
-    {
-        system("cls");
-        topDesign();
-        displayMainMenu();
-        choice = numInput();
-    }
-        switch (choice)
-        {
-            case 1:
-                system("cls");
-                newGame(PLNames, Playing, PlayerList, rows, columns, MaxPlrGame);
-                break;
+    int choice = 0;
+    while(checkContinue == 1){
+        choice = 0; //reset choice each loop iteration
 
-            case 2:
-                system("cls");
-                statisticsMenu(settings, Playing, PlayerList, PLNames, rows, columns, MaxPlrGame);
-                break;
-
-            case 3:
-                system("cls");
-                settingsMenu(&settings, Playing, PlayerList, PLNames, rows, columns, MaxPlrGame);
-                break;
-
-            case 4:
-                checkContinue = 0;
-                printf("You have exited the program.\n");
-                break;
-            case 5:
-                printf("Playerlist: \n");
-                for(processList = 0; processList < MAX_PLAYERS; processList++)
-                {
-                    printf("%s\n", PlayerList[processList].username);
-                }
-
-                processList = 0;
-
-                printf("Playing: \n");
-                for(processList = 0; processList < MaxPlrGame; processList++)
-                {
-                    printf("%s\n", Playing[processList].username);
-                }
-        }
-}
-
-void newGame(String36 PlayerNames[], Player Playing[], Player PlayerList[], int rows, int columns, int MaxPlrGame)
-{
-    int selectPlayers = 0, CPlr1 = 0, CPlr2 = 1; //CPlrN == Choose Player Number 1 in the choices (look code below)
-    int choice = -1, inputDone = 0, attempted = 0;
-    int sameNamePlaying = 0, sameNamePL = 0, overall = 0, displayPlaying, initializePlaying, checckPlayerList, checkplayerlist2; //The last 4 are tester variables
-    int players_Playing = 0;
-
-    String36 PlayerName;
-    String50 Input;
-    strcpy(Input, "");
-    strcpy(PlayerName, "");
-
-    while(!(players_Playing >= 3 && players_Playing <= 6))
-    {
-        topDesign();
-        printf("How many players are going to play? (at least 3 with the max of 6):\n");
-        players_Playing = numInput();
-        system("cls");
-
-    }
-
-    for(initializePlaying = 0; initializePlaying < MaxPlrGame; initializePlaying++)
-    {
-        strcpy(Playing[initializePlaying].username, "_");
-    }
-
-    for(selectPlayers = 0; selectPlayers < players_Playing; selectPlayers++)
-    {
-        while(!(choice >= 1 && choice <= 6))
+        while(!(choice >= 1 && choice <= 4))
         {
             system("cls");
             topDesign();
-            printf("Player %d: \n", selectPlayers + 1);
-            printf("\nSelect Player %d\n", selectPlayers + 1);
-            printf("[1] Add new player\n");
-            printf("[2] %s\n", PlayerNames[CPlr1]); //here (CPlr1)
-            printf("[3] %s\n", PlayerNames[CPlr2]); //here (CPlr2)
-            // printf("Playername: %s\n", PlayerName); //Testing Purposes
-            // printf("Playername's length: %d\n", strlen(PlayerName)); //Testing Purposes
-            // printf("Overall? %d", overall);
+            displayMainMenu();
             choice = numInput();
         }
-
             switch (choice)
             {
                 case 1:
-                    sameNamePL = 1;
-                    sameNamePlaying = 1;
-                    overall = sameNamePL + sameNamePlaying;
-                    
-                    while(((strlen(Input) > 36 || strlen(Input) == 0) || strcspn(Input, " ") != strlen(Input)) || overall != 0)
-                    {
-                        system("cls");
-                        topDesign();
-                        errUser(sameNamePlaying, sameNamePL, Input, &attempted);
-                        printf("Username: ");
-                        strInput(Input, 51);
-                        attempted++;
-                        sameNamePlaying = checkSameName(Playing, Input, MaxPlrGame);
-                        sameNamePL = checkSameName(PlayerList, Input, MAX_PLAYERS);
-                        overall = sameNamePlaying + sameNamePL;
-                    }
-                    strcpy(PlayerName, Input);
-                    strcpy(Playing[selectPlayers].username, PlayerName);
-                    addtoPL(PlayerNames, rows, PlayerName);
-                    choice = -1;
-                    attempted = 0;
+                    system("cls");
+                    newGame(settings, game);
                     break;
 
                 case 2:
-                    strcpy(PlayerName,PlayerNames[CPlr1]);
-                    strcpy(Playing[selectPlayers].username, PlayerName);
-                    addtoPL(PlayerNames, rows, PlayerName);
-                    CPlr1++;
-                    CPlr2++;
-                    while(checkSameName(Playing, PlayerNames[CPlr1], MaxPlrGame) == 1)
-                    //This statement is when the choice for Playername is in the Playing List despite increment.
-                    {
-                        CPlr1++; 
-                        CPlr2++;    
-                    }
-                    choice = -1;
+                    system("cls");
+                    statisticsMenu(settings, game);
                     break;
-                    
+
                 case 3:
-                    strcpy(PlayerName,PlayerNames[CPlr2]);
-                    strcpy(Playing[selectPlayers].username, PlayerName);
-                    addtoPL(PlayerNames, rows, PlayerName);
-                    CPlr2++;
-                    while(checkSameName(Playing, PlayerNames[CPlr2], MaxPlrGame) == 1)
-                    //Same thing but for the third choice.
-                    {
-                        CPlr2++;    
-                    }
-                    choice = -1;
+                    system("cls");
+                    settingsMenu(settings, game);
                     break;
+
                 case 4:
-                    for(checckPlayerList = 0; checckPlayerList < MAX_PLAYERS; checckPlayerList++)
-                    {
-                        printf("%s\n", PlayerList[checckPlayerList].username);
-                    }
-                    scanf("%d", &choice);
+                    checkContinue = 0;
+                    printf("You have exited the program.\n");
                     break;
-                case 5:
-                    for(checkplayerlist2 = 0; checkplayerlist2 < MaxPlrGame; checkplayerlist2++)
-                    {
-                        printf("%s\n", Playing[checkplayerlist2].username);
-                    }
-                    scanf("%d", &choice);
-                    break;
-                case 6:
-                    for(checkplayerlist2 = 0; checkplayerlist2 < MAX_PLAYERS; checkplayerlist2++)
-                    {
-                        printf("%s\n", PlayerNames[checkplayerlist2]);
-                    }
-                    scanf("%d", &choice);
-                    break;
-            } 
+                // case 5:
+                //     printf("Playerlist: \n");
+                //     for(processList = 0; processList < MAX_PLAYERS; processList++)
+                //     {
+                //         printf("%s\n", game->PlayerList[processList].username);
+                //     }
+
+                //     printf("Playing: \n");
+                //     for(processList = 0; processList < game->playersPlaying; processList++)
+                //     {
+                //         printf("%s\n", Playing[processList].username);
+                //     }
+                //     break;
+            }
     }
-    updatePlayerList(PlayerList, PlayerNames, MAX_PLAYERS);
-    finalPlayers(PlayerNames, Playing, PlayerList, rows, columns, MaxPlrGame, &players_Playing);
 }
 
-void statisticsMenu(GameSettings settings, Player Playing[], Player PlayerList[], String36 PLNames[], int rows, int columns, int MaxPlrGame)
+void newGame(GameSettings *settings, GameData *game)
+{
+    int players_Playing = 0;
+    int confirmed = 0;
+
+    while(confirmed == 0)
+    {
+        players_Playing = 0;
+
+        while(!(players_Playing >= 3 && players_Playing <= 6))
+        {
+            topDesign();
+            printf("How many players are going to play? (minimum 3, maximum 6):\n");
+            players_Playing = numInput();
+            //system("cls");
+
+            if(!(players_Playing >= 3 && players_Playing <= 6))
+                printf("Invalid number. Please enter between 3 and 6.\n");
+        }
+        game->playersPlaying = players_Playing;
+
+        // Initialize Playing array
+        for(int i = 0; i < MAX_PLAYERS_IN_GAME; i++)
+        {
+            game->Playing[i].info = NULL; //no player assigned yet
+            game->Playing[i].score = 0;
+            game->Playing[i].scoreCards = 0;
+            for(int j = 0; j < NUM_COLORS; j++)
+            {
+                game->Playing[i].tank[j] = 0;
+                game->Playing[i].tankPoints[j] = 0;
+            }
+        }
+
+        //select players
+        selectPlayers(game->Playing, game->PlayerList, game->PlayerNames, &game->playersPlaying);
+
+        //save updated player list
+        updatePlayerList(game->PlayerList, MAX_PLAYERS);
+
+        //finalize and start game
+        finalPlayers(settings, game, &confirmed);
+    }
+    runGame(game->Playing, game->playersPlaying, *settings);
+}
+
+void errUser(int sameNamePlay, int sameNamePL, char plrInp[], int *attempted)
+{
+    if(sameNamePlay == 1 && *attempted != 0)
+    {
+        printf("There is already a player with that username in the game!\n");
+        *attempted = 0;
+    }
+    if(sameNamePL == 1 && *attempted != 0)
+    {
+        printf("That username already exists in the player list! Select them instead.\n");
+        *attempted = 0;
+    }
+    if(strcspn(plrInp, " ") != strlen(plrInp) && *attempted != 0)
+    {
+        printf("Spaces are not allowed in usernames.\n");
+        *attempted = 0;
+    }
+    if(strlen(plrInp) == 0 && *attempted != 0)
+    {
+        printf("You have not entered anything yet!\n");
+        *attempted = 0;
+    }
+    else if(strlen(plrInp) > 36 && *attempted != 0)
+    {
+        printf("Username is too long (max 36 characters).\n");
+        *attempted = 0;
+    }
+}
+
+void addtoPL(String36 PLName[], int rows, String36 plrname)
+{
+    int processPL;
+    int isAdded = 0;
+
+    for(processPL = 0; processPL < rows && isAdded == 0; processPL++)
+    {
+        if(strcmp(PLName[processPL], "_") == 0)
+        {
+            strcpy(PLName[processPL], plrname);
+            isAdded = 1;
+        }
+    }
+}
+
+void selectPlayers(GameState Playing[], Player PlayerList[], String36 PlayerNames[], int *players_Playing)
+{
+    int i, j;
+    String36 input;
+    int validInput, index, choice, attempted, sameNamePlaying, sameNamePL;
+
+    for(i = 0; i < *players_Playing; i++)
+    {
+        validInput = 0;
+
+        while(validInput == 0)
+        {
+            system("cls");
+            topDesign();
+
+            printf("Player %d\n\n", i + 1);
+            printf("[1] Select existing player\n");
+            printf("[2] Create new player\n");
+            choice = numInput();
+
+            if(choice == 1)
+            {
+                displayAvailablePlayers(PlayerList, MAX_PLAYERS);
+                //printf("Enter player number: ");
+                int plyrNum = numInput();
+
+                //counts non empty usernames in playerlist
+                int availCount = 0;
+                int k;
+                for(k = 0; k < MAX_PLAYERS; k++)
+                {
+                    if(strcmp(PlayerList[k].username, "_") != 0)
+                        availCount++;
+                }
+
+                if(plyrNum < 1 || plyrNum > availCount)
+                {
+                    printf("Invalid player number. Please select from 1 to %d.\n", availCount);
+                }
+                else
+                {
+                    int count = 0;
+                    index = -1;
+                    for(k = 0; k < MAX_PLAYERS && index == -1; k++)
+                    {
+                        if(strcmp(PlayerList[k].username, "_") != 0)
+                        {
+                            count++;
+                            if(count == plyrNum)
+                                index = k;
+                        }
+                    }
+
+                    if(checkSameName(Playing, PlayerList[index].username, *players_Playing) == 1)
+                    {
+                        printf("That player is already in the game.\n");
+                    }
+                    else
+                    {
+                        Playing[i].info = &PlayerList[index];
+                        Playing[i].score = 0;
+                        Playing[i].scoreCards = 0;
+                        for(j = 0; j < NUM_COLORS; j++)
+                        {
+                            Playing[i].tank[j] = 0;
+                            Playing[i].tankPoints[j] = 0;
+                        }
+                        validInput = 1;
+                    }
+                } 
+            } 
+            else if(choice == 2)
+            {
+                attempted = 0;
+                sameNamePlaying = 0;
+                sameNamePL = 0;
+                strcpy(input, "");
+                validInput = 0;
+
+                while(validInput == 0)
+                {
+                    system("cls");
+                    topDesign();
+                    printf("Player %d | Create new player\n\n", i + 1);
+                    errUser(sameNamePlaying, sameNamePL, input, &attempted);
+                    printf("Enter new username (max 36 chars, no spaces): ");
+                    strInput(input, MAX_PLAYER_CHAR);
+                    attempted = 1;
+
+                    if(strlen(input) == 0 || strlen(input) > 36 || strcspn(input, " ") != strlen(input))
+                    {
+                        sameNamePlaying = 0;
+                        sameNamePL = 0;
+                    }
+                    else
+                    {
+                        sameNamePlaying = checkSameName(Playing, input, *players_Playing);
+                        sameNamePL = (findPlayer(PlayerList, MAX_PLAYERS, input) != -1); //checks if username already exists in player list
+
+                        if(sameNamePlaying == 0 && sameNamePL == 0)
+                        {
+                            createNewPlayer(PlayerList, PlayerNames, MAX_PLAYERS, input);
+                            index = findPlayer(PlayerList, MAX_PLAYERS, input); 
+
+                            if(index != -1)
+                            {
+                                Playing[i].info = &PlayerList[index];
+                                Playing[i].score = 0;
+                                Playing[i].scoreCards = 0;
+                                for(j = 0; j < NUM_COLORS; j++)
+                                {
+                                    Playing[i].tank[j] = 0;
+                                    Playing[i].tankPoints[j] = 0;
+                                }
+                                validInput = 1;
+                            }
+                        }
+                    }
+                } 
+            } 
+            else
+            {
+                printf("Invalid option.\n");
+            }
+        } 
+    } 
+} 
+
+void createNewPlayer(Player PlayerList[], String36 PlayerNames[], int max_players, String36 name)
+{
+    int i;
+    int added = 0;
+
+    for(i = 0; i < max_players && added == 0; i++)
+    {
+        if(strcmp(PlayerList[i].username, "_") == 0)
+        {
+            strcpy(PlayerList[i].username, name);
+            PlayerList[i].stats.wins = 0;
+            PlayerList[i].stats.highScore = 0;
+            addtoPL(PlayerNames, max_players, name);
+            added = 1;
+        }
+    }
+
+    if(added == 0)
+        printf("Player list full.\n");
+}
+
+int findPlayer(Player PlayerList[], int max_players, String36 name)
+{
+    int i;
+    int index = - 1;
+
+    for(i = 0; i < max_players && index == -1; i++)
+    {
+        if(strcmp(PlayerList[i].username, name) == 0)
+            index = i;
+    }
+
+    return index;
+}
+
+int checkSameName(GameState List[], char Playername[], int MaxPlrGame)
+{
+    int processList, sameName = 0, checker = 0;
+    for(processList = 0; processList < MaxPlrGame && sameName == 0; processList++)
+    {
+        if(List[processList].info != NULL && strcmp(Playername, List[processList].info->username) == 0) //added NULL since it crashes on unsigned value
+        {
+            sameName = 1;
+        }
+    }
+
+    return sameName;
+}
+
+int usernameExists(GameState List[], int size, String36 name)
+{
+    int i;
+    int stop = 0; int exists = 0;
+    for(i = 0; i < size && stop != 1; i++){
+        if(List[i].info != NULL && strcmp(List[i].info->username, name) == 0 && stop != 1){
+            exists = 1;
+            stop = 1;
+        }
+    }
+    return exists;
+}
+
+void displayAvailablePlayers(Player PlayerList[], int max_players)
+{
+    int i;
+
+    printf("\nAvailable Players:\n");
+
+    for(i = 0; i < max_players; i++)
+    {
+        if(strcmp(PlayerList[i].username, "_") != 0)
+        {
+            printf("[%d] %-25s\t\t(Wins:%3d HighScore:%3d)\n", i + 1, PlayerList[i].username, PlayerList[i].stats.wins, PlayerList[i].stats.highScore);
+        }
+    }
+
+    printf("\n");
+}
+
+void statisticsMenu(GameSettings *settings, GameData *game)
 {
     int choice = 0;
     while(!(choice >= 1 && choice <= 3))
@@ -224,28 +408,34 @@ void statisticsMenu(GameSettings settings, Player Playing[], Player PlayerList[]
     switch(choice)
     {
         case 1:
+            system("cls");
+            topDesign();
+            displayTopPlayers(game->PlayerList, MAX_PLAYERS, 1);
             break;
         case 2:
+        system("cls");
+            topDesign();
+            displayTopPlayers(game->PlayerList, MAX_PLAYERS, 2);
             break;
         case 3:
-            menu(settings, Playing, PlayerList, PLNames, rows, columns, MaxPlrGame);
+           // menu(settings, game);
             break;
     }
 }
 
-void settingsMenu(GameSettings* settings, Player Playing[], Player PlayerList[], String36 PLNames[], int rows, int columns, int MaxPlrGame)
+void settingsMenu(GameSettings* settings, GameData *game)
 {
 
     int choice = 0;
     while(!(choice >= 1 && choice <= 3))
-    {
+    {   system("cls");
         topDesign();
         printf("Settings\n");
         printf("[1] Change seed\n");
         printf("[2] Change default points to win\n");
         printf("[3] Exit Settings\n");
         choice = numInput();
-        system("cls");
+        
     }
 
     switch(choice)
@@ -253,7 +443,7 @@ void settingsMenu(GameSettings* settings, Player Playing[], Player PlayerList[],
         case 1:
         {
             int yn = 0;
-            printf("The default shuffle speed is normal.\n");
+            printf("The default shuffle speed is %d.\n" , settings->shufflingSeed);
             printf("Would you like to change the shuffle seed?\n");
             printf("[1] Yes\n[2] No\n");
             
@@ -273,18 +463,17 @@ void settingsMenu(GameSettings* settings, Player Playing[], Player PlayerList[],
             }
 
             else if(yn == 2){
-                settings->shufflingSeed = Seed;
+                //settings->shufflingSeed = Seed;
+                printf("Shuffle seed remains at default: %d\n", settings->shufflingSeed);
             }
-            
-            else
-                printf("You have entered a wrong number! Choose from 1 or 2 only. \n");
-            
+            printf("Press Enter to continue...\n");
+            getchar();
             break;
         }
         case 2:
         {   
             int yn = 0;
-            printf("The default winning points is 20.\n");
+            printf("The default winning points is: %d.\n", settings->winningPts);
             printf("Would you like to change the winning point?\n");
             printf("[1] Yes\n[2] No\n");
             
@@ -300,26 +489,77 @@ void settingsMenu(GameSettings* settings, Player Playing[], Player PlayerList[],
                     if(settings->winningPts <= 0)
                         printf("Please enter a number above 0. \n");
                 }while(settings->winningPts <= 0);
-                
-
+            
             printf("Your new shuffle speed is: %d\n", settings->winningPts);
             }
 
-            else if(choice == 2){
-                settings->winningPts = 20; 
+            else if(yn == 2){
+                printf("Winning point remains at default: %d\n", settings->winningPts);
             }
             
-            else
-                printf("You have entered a wrong number! Choose from 1 or 2 only. \n");
-        }
             break;
-
+        }
         case 3:
-            menu(*settings, Playing, PlayerList, PLNames, rows, columns, MaxPlrGame);
+           // menu(settings, game);
             break;
     }
 }
 
+
+void finalPlayers(GameSettings *settings, GameData *game, int *confirmed)
+{
+    int choice = -1, choice2 = -1, displayFinal, done = 0, i;
+
+    while(done == 0)
+    {
+        choice = -1;
+        while(!(choice == 1 || choice == 2))
+        {
+            system("cls");
+            topDesign();
+            printf("Playing:\n\n");
+            for(i = 0; i < game->playersPlaying; i++)
+            {
+                printf("  [%d] %s\n", i + 1,
+                       game->Playing[i].info->username);
+            }
+            printf("\nIs this lineup final?\n");
+            printf("[1] Yes = start the game\n");
+            printf("[2] No  = go back and reconfigure\n");
+            choice = numInput();
+        }
+
+        if(choice == 1)
+        {
+            *confirmed = 1;
+            done = -1;
+        }
+        else if(choice == 2)
+        {
+            choice2 = -1;
+            while(!(choice2 == 1 || choice2 == 2))
+            {
+                system("cls");
+                topDesign();
+                printf("Do you want to reset?\n\n");
+                printf("Take note: if you proceed to still do this, you will have to reconfigure the new game portion.\n");
+                printf("That means having to re-enter the number of players, as well as inputting their names if they opt to.\n");
+                printf("\nAre you ABSOLUTELY sure that you want to do this?\n");
+                printf("[1] Yes, reset\n");
+                printf("[2] No, go back\n");
+                choice2 = numInput();
+            }
+
+            if(choice2 == 1)
+            {
+                // returns to newGame()'s while loop instead of recursing
+                *confirmed = 0;
+                done = 1;
+            }
+            // choice2 == 2: loop back to show lineup again
+        }
+    }
+}
 
 /* II. Extra Essentials */
 void displayMainMenu()
@@ -337,126 +577,3 @@ void topDesign()
     printf("-----------MANTIS------------\n");
     printf("*~*~*~*~*~*~*~*~*~*~*~*~*~*~*\n");
 }
-
-int checkSameName(GameState List[], char Playername[], int MaxPlrGame)
-{
-    int processList, sameName = 0, checker = 0;
-
-    for(processList = 0; processList < MaxPlrGame && sameName == 0; processList++)
-    {
-        if(strcmp(Playername, List[processList].username) == 0)
-        {
-            sameName = 1;
-        }
-    }
-    return sameName;
-}
-
-void errUser(int sameNamePlay, int sameNamePL, char plrInp[], int* attempted)
-{
-    if(sameNamePlay == 1 && *attempted != 0)
-    {
-        printf("There is already an existing username!\n");
-        *attempted = 0;
-    }
-    if(sameNamePL == 1 && *attempted != 0)
-    {
-        printf("There is already a username in the player list! Choose there instead!\n");
-        *attempted = 0;
-    }
-    if(strcspn(plrInp, " ") != strlen(plrInp) && *attempted != 0)
-    {
-        printf("Spaces should not exist in your username.\n");
-        *attempted = 0;
-    }
-    if(strlen(plrInp) == 0 && *attempted != 0)
-    {
-        printf("You have not typed anything yet!\n");
-        *attempted = 0;
-    }
-    else if(strlen(plrInp) > 36 && *attempted != 0)
-    {
-        printf("Your username is too long!\n");
-        *attempted = 0;
-    }
-}
-
-void finalPlayers(String36 PL[], Player Playing[], Player PlayerList[], int rows, int columns, int MaxPlrGame, int* players_Playing) //(String36 PlayerNames[], Player Playing[], Player PlayerList[], int rows, int columns, int* MaxPlrGame)
-{
-    int choice = -1, choice2 = -1, displayFinal, done = 0;
-
-    while(done == 0)
-    {
-        while(!(choice == 1 || choice == 2)) 
-        {
-            system("cls");
-            topDesign();
-            printf("Playing:\n");
-            for(displayFinal = 0; displayFinal < *players_Playing; displayFinal++)
-            {
-                printf("%s\n", Playing[displayFinal].username);
-            }
-            printf("\nIs this final?\n");
-            printf("[1] Yes\n");
-            printf("[2] No\n");
-            choice = numInput();
-
-            if(choice == 3)
-            {
-                for(displayFinal = 0; displayFinal < MAX_PLAYERS; displayFinal++)
-                {
-                    printf("%s\n", PlayerList[displayFinal]);
-                }
-                scanf("%s", &choice);
-            }
-        }
-
-        if(choice == 1)
-        {
-            //game function chuchu this is where they start playing the game yayyy what fun :DD
-            done = 1;
-        }
-        else if (choice == 2)
-        {
-            while(!(choice2 == 1 || choice2 == 2))
-            {
-                system("cls");
-                topDesign();
-                printf("Do you want to reset?\n\n");
-                printf("Take note: if you proceed to still do this, you will have to reconfigure the new game portion.\n");
-                printf("That means having to re-enter the number of players, as well as inputting their names if they opt to.\n");
-                printf("\nAre you ABSOLUTELY sure that you want to do this?\n");
-                printf("[1] Yes\n");
-                printf("[2] No\n");
-                choice2 = numInput();
-                }
-                if(choice2 == 1)
-                {
-                    done = -1;
-                    *players_Playing = 0;
-                    system("cls");
-                    newGame(PL, Playing, PlayerList, rows, columns, MaxPlrGame);
-                }
-                else if(choice2 == 2)
-                {
-                    choice = -1;
-                    choice2 = -1;
-                }
-        }
-    }
-}
-
-void addtoPL(String36 PLName[], int rows, String36 plrname)
-{
-    int processPL, isAdded = 0;
-
-    for(processPL = 0; processPL < rows && isAdded == 0; processPL++)
-    {
-        if(strcmp(PLName[processPL], "_") == 0)
-        {
-            strcpy(PLName[processPL], plrname);
-            isAdded = 1;
-        }
-    }
-}
-
