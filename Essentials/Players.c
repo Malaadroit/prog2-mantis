@@ -7,8 +7,6 @@
  *  Acknowledgments : <list of references used in the making of this project>
  ******************************************************************************/
 
-
-
 /* ----- preprocessor directives ----- */
 #include <stdio.h>
 #include <string.h>
@@ -19,67 +17,6 @@ void finalizePLNames(String36 PLNames[], int max_players);
 void createPlayerList(Player PL[], int max_players);
 void updatePlayerList(Player PL[], int max_players);
 /* ----- function implementations ----- */
-// void createPlayerList(Player PL[], String36 PLNames[], int max_players)
-// {
-//     FILE *fp_output;
-//     int processList;
-
-//     fp_output = fopen("players.txt", "w");
-//     for(processList = 0; processList < max_players; processList++)
-//     {
-//         strcpy(PL[processList].username, PLNames[processList]);
-//         fprintf(fp_output, "%s\n", PL[processList].username);
-//         //fprintf(fp_output, "%s %d %d\n", PL[processList].username, PL[processList].wins, PL[processList].highScore);
-//     }
-    
-//     fclose(fp_output);
-// }
-
-// void updatePlayerList(Player PL[], String36 PLNames[], int max_players)
-// {
-//     FILE *fp_update;
-//     int processList, players = 0, requiredAdding = 0, toAdd = 0, isAdded = 0;
-//     for(processList = 0; processList < max_players; processList++)
-//     {
-//         if(strcmp(PL[processList].username, "_") != 0)
-//         {
-//             players++; 
-//         }
-//         if(strcmp(PL[processList].username, PLNames[processList]) != 0) 
-//         //if not same name and is blank ("_", though technically di sya blank computer-wise, both PLNames and PL have this) then
-//         {
-//             toAdd++;
-//         }
-//     }
-
-//     requiredAdding = players + toAdd;
-//     for(processList = 0; processList < requiredAdding; processList++)
-//     {
-//         if(strcmp(PL[processList].username, PLNames[processList]) != 0 && strcmp(PL[processList].username, "_") == 0)
-//         {
-//             strcpy(PL[processList].username, PLNames[processList]);
-//         }
-//     }
-
-//     fp_update = fopen("players.txt", "w");
-//     for(processList = 0; processList < max_players; processList++)
-//     {
-//         fprintf(fp_update, "%s\n", PL[processList].username);
-//     }
-//     fclose(fp_update);
-// }
-
-// void finalizePLNames(String36 PLNames[], int max_players)
-// {
-//     int processList;
-//     for(processList = 0; processList < max_players; processList++)
-//     {
-//         if(strcmp(PLNames[processList], "") == 0)
-//         {
-//             strcpy(PLNames[processList], "_");
-//         }
-//     }
-// }
 
 //redesigning of fileprocessing of player.txt
 void createPlayerList(Player PL[], int max_players)
@@ -189,9 +126,9 @@ void displayTopPlayers(Player PlayerList[], int max_players, int sortBy)
         if(strcmp(sorted[i].username, "_") != 0)
         {
             if(sortBy == 1)
-                printf("%d. %-37s Wins: %5d\n", rank, sorted[i].username, sorted[i].stats.wins);
+                printf("%d. %-25s Wins: %3d\n", rank, sorted[i].username, sorted[i].stats.wins);
             else
-                printf("%d. %-37s High Score: %5d\n", rank, sorted[i].username, sorted[i].stats.highScore);
+                printf("%d. %-25s High Score: %3d\n", rank, sorted[i].username, sorted[i].stats.highScore);
 
             rank++;
             displayed++;
