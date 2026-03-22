@@ -2,16 +2,19 @@
 #include <stdio.h>
 #include <string.h>
 #include "defs.h"
-
 /* ----- function prototypes ----- */
 int colorToIndex(char color);
 void displayGameState(GameState Playing[], int numPlayers);
 void shuffle(void* array, size_t nitems, size_t size, unsigned int seed);
-void runGame(GameState Playing[], int numPlayers, GameSettings settings);
+void runGame(GameState Playing[], int numPlayers, GameSettings settings, Player PlayerList[]);
 void performScore(GameState Playing[], int currentPlayer, Card deck[], int* drawIdx, int deckSize);
 void performSteal(GameState Playing[], int currentPlayer, int targetPlayerIdx, Card deck[], int *deckIdx, int deckSize); 
-void displayGameResults(GameState Playing[], int numPlayers, int winnerIdx);
+void displayGameResults(GameState Playing[], int numPlayers, int winnerIdx, Player PlayerList[]);
 int checkWinCondition(GameState Playing[], int numPlayers, int* winnerIdx, int deckIdx, int deckSize, int winningPts);
+void addWin(int winnerIdx, GameState Playing[], Player PlayerList[]);
+
+//Extras
+void topDesign2();
 /* ----- function implementations ----- */
 //converts color char to index for tank array
 int colorToIndex(char color)
@@ -42,11 +45,11 @@ void displayGameState(GameState Playing[], int numPlayers)
         printf("\n");
     }
 }
-void runGame(GameState Playing[], int numPlayers, GameSettings settings) {
+void runGame(GameState Playing[], int numPlayers, GameSettings settings, Player PlayerList[]) {
     Card deck[84];
     int deckSize = 0; 
     int fileLoaded = 0;
-
+    topDesign2();
     //file reading of mantis.txt
     FILE *file = fopen("mantis.txt", "r");
     if (file != NULL) {
@@ -94,9 +97,7 @@ void runGame(GameState Playing[], int numPlayers, GameSettings settings) {
             }
         }
 
-        displayGameState(Playing, numPlayers);
         printf("The game has started!\n");
-
         int gameOver = 0;
         int turn = 0;
         int currentPlayer;
@@ -163,7 +164,7 @@ void runGame(GameState Playing[], int numPlayers, GameSettings settings) {
             
         }
 
-        displayGameResults(Playing, numPlayers, winnerIdx);
+        displayGameResults(Playing, numPlayers, winnerIdx, PlayerList);
     }
 }
 
@@ -242,7 +243,7 @@ void performSteal(GameState Playing[], int currentPlayer, int targetPlayerIdx,
     }
 }
 
-void displayGameResults(GameState Playing[], int numPlayers, int winnerIdx)
+void displayGameResults(GameState Playing[], int numPlayers, int winnerIdx, Player PlayerList[])
 {
     int i;
     printf("\n===== GAME OVER =====\n");
@@ -266,6 +267,7 @@ void displayGameResults(GameState Playing[], int numPlayers, int winnerIdx)
     printf("=====================\n\n");
     printf("Returning to main menu...\n");
     getchar();
+    addWin(winnerIdx, Playing, PlayerList);
 }
 
 int checkWinCondition(GameState Playing[], int numPlayers, int* winnerIdx, int deckIdx, int deckSize, int winningPts)
@@ -334,4 +336,24 @@ int checkWinCondition(GameState Playing[], int numPlayers, int* winnerIdx, int d
         }
     }
 return found;
+}
+
+void topDesign2()
+{
+    printf("*~*~*~*~*~*~*~*~*~*~*~*~*~*~*\n");
+    printf("-----------MANTIS------------\n");
+    printf("*~*~*~*~*~*~*~*~*~*~*~*~*~*~*\n");
+}
+
+
+void addWin(int winnerIdx, GameState Playing[], Player PlayerList[])
+{
+    Playing[winnerIdx].info->stats.wins += 1;
+
+    if(Playing[winnerIdx].score > Playing[winnerIdx].info->stats.highScore)
+    {
+        Playing[winnerIdx].info->stats.highScore = Playing[winnerIdx].score;
+    }
+
+    updatePlayerList(PlayerList, MAX_PLAYERS);
 }

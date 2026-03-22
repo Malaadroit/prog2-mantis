@@ -12,18 +12,18 @@
 #include <string.h>
 #include "../Essentials/Helpers/helpers_1.c"
 #include "../Essentials/Helpers/helpers_2.c"
-#include "../Essentials/defs.h"
 #include "../Essentials/Players.c"
 #include "../Essentials/GameStructure.c"
+#include "../Essentials/defs.h"
 
 
 /* ----- function prototypes ----- */
 //I. Core
-void menu(GameSettings *settings, GameData *game);
-void newGame(GameSettings *settings, GameData *game);
+void menu(GameSettings *settings, GameData *game, Player PlayerList[]);
+void newGame(GameSettings *settings, GameData *game, Player PlayerList[]);
 void statisticsMenu(GameSettings *settings, GameData *game);
 void settingsMenu(GameSettings *settings, GameData *game);
-void runGame(GameState Playing[], int numPlayers, GameSettings settings);
+void runGame(GameState Playing[], int numPlayers, GameSettings settings, Player PlayerList[]);
 
 // II. Helper Functions for Player Selection
 void selectPlayers(GameState Playing[], Player PlayerList[], String36 PlayerNames[], int *players_Playing);
@@ -43,7 +43,7 @@ void topDesign();
 /* ----- function implementations ----- */
 
 /* I. Core Essentials */
-void menu(GameSettings *settings, GameData *game)
+void menu(GameSettings *settings, GameData *game,  Player PlayerList[])
 {
     int checkContinue = 1;
     int choice = 0;
@@ -61,7 +61,7 @@ void menu(GameSettings *settings, GameData *game)
             {
                 case 1:
                     system("cls");
-                    newGame(settings, game);
+                    newGame(settings, game, PlayerList);
                     break;
 
                 case 2:
@@ -78,41 +78,28 @@ void menu(GameSettings *settings, GameData *game)
                     checkContinue = 0;
                     printf("You have exited the program.\n");
                     break;
-                // case 5:
-                //     printf("Playerlist: \n");
-                //     for(processList = 0; processList < MAX_PLAYERS; processList++)
-                //     {
-                //         printf("%s\n", game->PlayerList[processList].username);
-                //     }
-
-                //     printf("Playing: \n");
-                //     for(processList = 0; processList < game->playersPlaying; processList++)
-                //     {
-                //         printf("%s\n", Playing[processList].username);
-                //     }
-                //     break;
             }
     }
 }
 
-void newGame(GameSettings *settings, GameData *game)
+void newGame(GameSettings *settings, GameData *game, Player PlayerList[])
 {
     int players_Playing = 0;
     int confirmed = 0;
 
     while(confirmed == 0)
     {
-        players_Playing = 0;
+        players_Playing = -999;
 
         while(!(players_Playing >= 3 && players_Playing <= 6))
         {
             topDesign();
+            if(!(players_Playing >= 3 && players_Playing <= 6) && players_Playing != -999)
+                printf("Invalid number. Please enter between 3 and 6.\n");
             printf("How many players are going to play? (minimum 3, maximum 6):\n");
             players_Playing = numInput();
-            //system("cls");
-
-            if(!(players_Playing >= 3 && players_Playing <= 6))
-                printf("Invalid number. Please enter between 3 and 6.\n");
+            system("cls");
+            
         }
         game->playersPlaying = players_Playing;
 
@@ -138,7 +125,7 @@ void newGame(GameSettings *settings, GameData *game)
         //finalize and start game
         finalPlayers(settings, game, &confirmed);
     }
-    runGame(game->Playing, game->playersPlaying, *settings);
+    runGame(game->Playing, game->playersPlaying, *settings, PlayerList);
 }
 
 void errUser(int sameNamePlay, int sameNamePL, char plrInp[], int *attempted)
@@ -204,7 +191,6 @@ void selectPlayers(GameState Playing[], Player PlayerList[], String36 PlayerName
             printf("[1] Select existing player\n");
             printf("[2] Create new player\n");
             choice = numInput();
-
             if(choice == 1)
             {
                 displayAvailablePlayers(PlayerList, MAX_PLAYERS);
@@ -531,6 +517,7 @@ void finalPlayers(GameSettings *settings, GameData *game, int *confirmed)
 
         if(choice == 1)
         {
+            system("cls");
             *confirmed = 1;
             done = -1;
         }
@@ -553,6 +540,7 @@ void finalPlayers(GameSettings *settings, GameData *game, int *confirmed)
             if(choice2 == 1)
             {
                 // returns to newGame()'s while loop instead of recursing
+                system("cls");
                 *confirmed = 0;
                 done = 1;
             }

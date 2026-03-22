@@ -66,7 +66,7 @@ int main()
             strcpy(game.PlayerNames[i], game.PlayerList[i].username);
     }
 
-    menu(&settings, &game);
+    menu(&settings, &game, game.PlayerList);
 
     return 0;
 }
