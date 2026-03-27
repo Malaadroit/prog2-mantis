@@ -6,17 +6,19 @@ Last modified: AUG-15-2020
 #include <stdio.h>
 #include <stdlib.h>
 
+// #ifdef INTERFACE_C
+// #define INTERFACE_C
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
 /* Constants for colors
 for use with iSetColor */
-const int I_COLOR_WHITE = 0;
-const int I_COLOR_RED = 1;
-const int I_COLOR_BLUE = 2;
+const int I_COLOR_WHITE = 1;
+const int I_COLOR_RED = 0;
+const int I_COLOR_BLUE = 4;
 const int I_COLOR_GREEN = 3;
-const int I_COLOR_YELLOW = 4;
+const int I_COLOR_YELLOW = 2;
 const int I_COLOR_CYAN = 5;
 const int I_COLOR_PURPLE = 6;
 
@@ -122,56 +124,6 @@ void iSetColor(int color)
 }
 // For Linux and MacOS terminal
 #else
-/* This function moves the cursor to the given location on the
-command line.
-@param (int) x is the column index of the desired location
-@param (int) y is the row index of the desired location
-@return (void)
-*/
-void iMoveCursor(int x, int y)
-{
-  printf("\033[%d;%dH", y + 2, x + 1);
-}
-
-/* This function clears a rectangular portion of the screen, and
-moves the cursor to the top-left corner of the rectangle after
-clearing.
-@param (int) x is the column index of the top-left point of the rectangular portion.
-@param (int) y is the row index of the top-left point of the rectangular portion.
-@param (int) width is the width of the rectangle.
-@param (int) height is the height of the rectangle.
-@return (void)
-*/
-void iClear(int x, int y, int width, int height)
-{
-  int i, j;
-  for (i = 0; i < height; i++)
-  {
-    iMoveCursor(x, y + i);
-    for (j = 0; j < width; j++)
-    {
-      printf(" ");
-    }
-    printf("\n");
-  }
-  iMoveCursor(x, y);
-}
-
-/* This function hides the cursor.
-@return (void)
-*/
-void iHideCursor()
-{
-  printf("\e[?25l");
-}
-
-/* This function shows the cursor.
-@return (void)
-*/
-void iShowCursor()
-{
-  printf("\e[?25h");
-}
 
 /* This function sets the color of any output statement
 such as printf.
