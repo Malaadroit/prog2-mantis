@@ -1,9 +1,9 @@
 /******************************************************************************
- *  Description     : <short description of the project>
+ *  Description     : This file contains the file processing of players from players.txt file
  *  Author/s        : Agamata, Loraine Beatriz
  *                    Lapuz, Dale Lucian M. 
- *  Section         : 
- *  Last Modified   : March 15, 2026
+ *  Section         : S12A & S22A
+ *  Last Modified   : March 27, 2026
  *  Acknowledgments : <list of references used in the making of this project>
  ******************************************************************************/
 
@@ -18,7 +18,11 @@ void createPlayerList(Player PL[], int max_players);
 void updatePlayerList(Player PL[], int max_players);
 /* ----- function implementations ----- */
 
-//redesigning of fileprocessing of player.txt
+/*
+* The function reads player data from players.txt and populates the PlayerList array.
+* @param PL The array of Player structs to be populated
+* @param max_players The maximum number of players to read from the file
+*/
 void createPlayerList(Player PL[], int max_players)
 {
     FILE *fp_output;
@@ -31,7 +35,7 @@ void createPlayerList(Player PL[], int max_players)
 
         for(processList = 0; processList < max_players; processList++)
         {
-            fprintf(fp_output, "_ 0 0\n"); //set to 0 since hsore and wins are int
+            fprintf(fp_output, "_ 0 0\n"); //set to 0 since score and wins are int
         }
 
         fclose(fp_output);
@@ -46,6 +50,11 @@ void createPlayerList(Player PL[], int max_players)
     fclose(fp_output);
 }
 
+/*
+* The function updates the player data in players.txt based on the PlayerList array.
+* @param PL The array of Player structs containing the updated player data
+* @param max_players The maximum number of players to write to the file
+*/
 void updatePlayerList(Player PL[], int max_players)
 {
     FILE *fp_update;
@@ -59,6 +68,13 @@ void updatePlayerList(Player PL[], int max_players)
     fclose(fp_update);
 }
 
+/*
+* The function adds a new player name to the PlayerList array.
+* @param PL The array of Player structs to be updated
+* @param PLUsernames The username to be added
+* @param max_players The maximum number of players in the array
+* @return 1 if the username was added successfully, 0 otherwise
+*/
 int addPLNames(Player PL[], String36 PLUsernames, int max_players)
 {
     int processList;
@@ -76,6 +92,12 @@ int addPLNames(Player PL[], String36 PLUsernames, int max_players)
     return success;
 }
 
+/*
+* The function displays the top players based on the specified sorting criteria.
+* @param PlayerList The array of Player structs to be displayed
+* @param max_players The maximum number of players to display
+* @param sortBy The criteria for sorting (1 for wins, 2 for high score)
+*/
 void displayTopPlayers(Player PlayerList[], int max_players, int sortBy)
 {
     Player sorted[MAX_PLAYERS];
@@ -126,9 +148,9 @@ void displayTopPlayers(Player PlayerList[], int max_players, int sortBy)
         if(strcmp(sorted[i].username, "_") != 0)
         {
             if(sortBy == 1)
-                printf("%d. %-25s Wins: %3d\n", rank, sorted[i].username, sorted[i].stats.wins);
+                printf("%2d. %-25s Wins: %3d\n", rank, sorted[i].username, sorted[i].stats.wins);
             else
-                printf("%d. %-25s High Score: %3d\n", rank, sorted[i].username, sorted[i].stats.highScore);
+                printf("%2d. %-25s High Score: %3d\n", rank, sorted[i].username, sorted[i].stats.highScore);
 
             rank++;
             displayed++;
@@ -141,3 +163,15 @@ void displayTopPlayers(Player PlayerList[], int max_players, int sortBy)
     printf("\nPress Enter to continue...\n");
     getchar();
 }
+
+/**
+* This is to certify that this project is my/our own work, based on my/our personal
+* efforts in studying and applying the concepts learned. I/We have constructed the
+* functions and their respective algorithms and corresponding code by myself/ourselves.
+* The program was run, tested, and debugged by my/our own efforts. I/We further certify
+* that I/we have not copied in part or whole or otherwise plagiarized the work of other
+* students and/or persons, nor did I employ the use of AI in any part of the deliverable.
+*
+* <Agamata, Loraine Beatriz C.> (12507121)
+* <Lapuz, Dale Lucian M.> (12505919)
+*/

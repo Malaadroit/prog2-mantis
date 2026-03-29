@@ -433,10 +433,11 @@ int findPlayer(Player PlayerList[], int max_players, String36 name)
 * @param List         Array of game state structures for each player in the current game
 * @param Playername   The name of the player to check for duplicates
 * @param MaxPlrGame   The maximum number of players in the game
+* @returns 1 if name is found, 0 otherwise
 */
 int checkSameName(GameState List[], char Playername[], int MaxPlrGame)
 {
-    int processList, sameName = 0, checker = 0;
+    int processList, sameName = 0;
     for(processList = 0; processList < MaxPlrGame && sameName == 0; processList++)
     {
         if(List[processList].info != NULL && strcmp(Playername, List[processList].info->username) == 0) //added NULL since it crashes on unsigned value
@@ -604,7 +605,7 @@ void settingsMenu(GameSettings* settings, GameData *game)
 */
 void finalPlayers(GameSettings *settings, GameData *game, int *confirmed)
 {
-    int choice = -1, choice2 = -1, displayFinal, done = 0, i;
+    int choice = -1, choice2 = -1, done = 0, i;
 
     while(done == 0)
     {
@@ -687,3 +688,16 @@ void topDesign()
     printf("*~*~*~*~*~*~*~*~*~*~*~*~*~*~*\n");
     iSetColor(I_COLOR_WHITE);
 }
+
+
+/**
+* This is to certify that this project is my/our own work, based on my/our personal
+* efforts in studying and applying the concepts learned. I/We have constructed the
+* functions and their respective algorithms and corresponding code by myself/ourselves.
+* The program was run, tested, and debugged by my/our own efforts. I/We further certify
+* that I/we have not copied in part or whole or otherwise plagiarized the work of other
+* students and/or persons, nor did I employ the use of AI in any part of the deliverable.
+*
+* <Agamata, Loraine Beatriz C.> (12507121)
+* <Lapuz, Dale Lucian M.> (12505919)
+*/
