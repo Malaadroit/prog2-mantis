@@ -1,9 +1,10 @@
 /******************************************************************************
- *  Description     : <short description of the file>
- *  Author/s        : <student1 full name (last name, first name)>
- *                    <student2 full name (last name, first name)>
- *  Section         : <your section>
- *  Last Modified   : <date when last revision was made>
+ *  Description     : This file contains structs and constants
+ *  Author/s        : Agamata, Loraine Beatriz
+ *                    Lapuz, Dale Lucian M. 
+ *  Section         : S12A & S22A
+ *  Last Modified   : March 27, 2026
+ *  Acknowledgments : <list of references used in the making of this project>
  ******************************************************************************/
 
 #ifndef DEFS_H // Include this to prevent redefinition error
@@ -53,6 +54,7 @@ typedef struct
 typedef struct {
     int winningPts;
     unsigned int shufflingSeed;
+    int twoPlayerMode; //for bonus feature. 0 = off, 1 = 2-Player Bonus Mode on */
 } GameSettings;
 
 /*
@@ -93,6 +95,9 @@ typedef struct {
     int scoreCards; //number of cards in the score pile
 } GameState;
 
+/*
+* Represents the overall game data structure
+*/
 typedef struct{
     Player PlayerList[MAX_PLAYERS];
     GameState Playing[6]; //players in the current match
@@ -100,3 +105,16 @@ typedef struct{
     int playersPlaying;
 } GameData;
 #endif // DEFS_H; Include this to prevent redefinition error
+
+
+/**
+* This is to certify that this project is my/our own work, based on my/our personal
+* efforts in studying and applying the concepts learned. I/We have constructed the
+* functions and their respective algorithms and corresponding code by myself/ourselves.
+* The program was run, tested, and debugged by my/our own efforts. I/We further certify
+* that I/we have not copied in part or whole or otherwise plagiarized the work of other
+* students and/or persons, nor did I employ the use of AI in any part of the deliverable.
+*
+* <Agamata, Loraine Beatriz C.> (12507121)
+* <Lapuz, Dale Lucian M.> (12505919)
+*/

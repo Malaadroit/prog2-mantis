@@ -1,21 +1,16 @@
 /******************************************************************************
- *  Description     : main menu file chuchu
+ *  Description     : The file consists of the menu system of the game. It asks for username input, modification of settings, and statistics.
  *  Author/s        : Agamata, Loraine Beatriz C.
  *                    Lapuz, Dale Lucian M.
- *  Section         : 
- *  Last Modified   : March 15, 2026
+ *  Section         : S12A & S22A
+ *  Last Modified   : March 27, 2026
  *  Acknowledgments : <list of references used in the making of this project>
  ******************************************************************************/
 
 /* ----- preprocessor directives ----- */
-#include <stdio.h>
-#include <string.h>
-#include "../Essentials/Helpers/helpers_1.c"
-#include "../Essentials/Helpers/helpers_2.c"
 #include "../Essentials/Players.c"
+#include "../Essentials/Additionals/interface.c"
 #include "../Essentials/GameStructure.c"
-#include "../Essentials/defs.h"
-
 
 /* ----- function prototypes ----- */
 //I. Core
@@ -37,24 +32,41 @@ void finalPlayers(GameSettings *settings, GameData *game, int *confirmed);
 void displayTopPlayers(Player PlayerList[], int max_players, int sortBy);
 
 //III. Extras
-void displayMainMenu();
+void displayMainMenu(char* status);
 void topDesign();
 
 /* ----- function implementations ----- */
 
 /* I. Core Essentials */
+/*
+* Displays the main menu and handles user navigation to different sections of the program.
+* @param settings    Pointer to the current game settings for accessing/updating configurations
+* @param game        Pointer to the current game data for accessing/updating game state
+* @param PlayerList  Array of player structures for managing player information
+* ====== BONUS FEATURES IMPLEMENTED IN THIS FUNCTION: ======
+* 2-Player Bonus Mode toggle directly in the main menu for easy access
+*/
 void menu(GameSettings *settings, GameData *game,  Player PlayerList[])
 {
     int checkContinue = 1;
     int choice = 0;
+    char* status; //BONUS pointer to hold display string for 2 player mode status in settings menu
+
     while(checkContinue == 1){
         choice = 0; //reset choice each loop iteration
 
-        while(!(choice >= 1 && choice <= 4))
+        //logic to determine what to display in the menu text
+        if (settings->twoPlayerMode == 1) {
+            status = "ON";
+        } else {
+            status = "OFF";
+        }   
+
+        while(!(choice >= 1 && choice <= 5))
         {
             system("cls");
             topDesign();
-            displayMainMenu();
+            displayMainMenu(status);
             choice = numInput();
         }
             switch (choice)
@@ -62,6 +74,7 @@ void menu(GameSettings *settings, GameData *game,  Player PlayerList[])
                 case 1:
                     system("cls");
                     newGame(settings, game, PlayerList);
+                    displayMainMenu(status);
                     break;
 
                 case 2:
@@ -75,6 +88,32 @@ void menu(GameSettings *settings, GameData *game,  Player PlayerList[])
                     break;
 
                 case 4:
+                {
+                    if (settings->twoPlayerMode == 0) {
+                        settings->twoPlayerMode = 1;
+                    } 
+                    else {
+                        settings->twoPlayerMode = 0;
+                    }
+
+                    system("cls"); 
+                    topDesign();
+                    if (settings->twoPlayerMode == 1) {
+                        iSetColor(I_COLOR_PURPLE);
+                        printf("2-Player Bonus Mode is now ON.\n");
+                        printf("Rules: win by 15 score-pile cards; successful steal = extra turn.\n");
+                        iSetColor(I_COLOR_WHITE);
+                    } 
+                    else {
+                        iSetColor(I_COLOR_WHITE);
+                        printf("2-Player Bonus Mode is now OFF. Standard rules apply.\n");
+                    }
+                    printf("\nPress Enter to continue...\n");
+                    getchar(); 
+                    break;
+                }
+                
+                case 5:
                     checkContinue = 0;
                     printf("You have exited the program.\n");
                     break;
@@ -82,21 +121,40 @@ void menu(GameSettings *settings, GameData *game,  Player PlayerList[])
     }
 }
 
+/*
+* The newGame function initializes a new game session by prompting the user to select the number of players, choose existing players or create new ones, and then starts the game with the selected settings and players.
+* @param settings    Pointer to the current game settings for accessing/updating configurations
+* @param game        Pointer to the current game data for accessing/updating game state
+* @param PlayerList  Array of player structures for managing player information
+* ====== BONUS FEATURES IMPLEMENTED IN THIS FUNCTION: ======
+* 1. Dynamic minimum player requirement based on 2-Player Bonus Mode setting
+*/
 void newGame(GameSettings *settings, GameData *game, Player PlayerList[])
 {
     int players_Playing = 0;
     int confirmed = 0;
 
+    int minPlayers;
+    //BONUS: determine min players based on 2 player mode setting
+    if (settings->twoPlayerMode == 1) {
+        minPlayers = 2;
+    } else {
+        minPlayers = 3;
+    }
+
     while(confirmed == 0)
     {
         players_Playing = -999;
 
-        while(!(players_Playing >= 3 && players_Playing <= 6))
+        while(!(players_Playing >= minPlayers && players_Playing <= 6))
         {
             topDesign();
-            if(!(players_Playing >= 3 && players_Playing <= 6) && players_Playing != -999)
-                printf("Invalid number. Please enter between 3 and 6.\n");
-            printf("How many players are going to play? (minimum 3, maximum 6):\n");
+            if(!(players_Playing >= minPlayers && players_Playing <= 6) && players_Playing != -999){
+                iSetColor(I_COLOR_RED);
+                printf("Invalid number. Please enter between %d and 6.\n", minPlayers);
+                iSetColor(I_COLOR_WHITE);
+            }
+            printf("How many players are going to play? (minimum %d, maximum 6):\n", minPlayers);
             players_Playing = numInput();
             system("cls");
             
@@ -128,6 +186,13 @@ void newGame(GameSettings *settings, GameData *game, Player PlayerList[])
     runGame(game->Playing, game->playersPlaying, *settings, PlayerList);
 }
 
+/*
+* The errUser function handles error messages for user input validation in player selection.
+* @param sameNamePlay  Flag indicating if the player name is already in use in the game
+* @param sameNamePL    Flag indicating if the player name is already in the player list
+* @param plrInp          The player input string
+* @param attempted       Pointer to the attempted input flag
+*/
 void errUser(int sameNamePlay, int sameNamePL, char plrInp[], int *attempted)
 {
     if(sameNamePlay == 1 && *attempted != 0)
@@ -157,6 +222,12 @@ void errUser(int sameNamePlay, int sameNamePL, char plrInp[], int *attempted)
     }
 }
 
+/*
+* The addtoPL function adds a new player name to the player list.
+* @param PLName  Array of player names
+* @param rows    Number of rows in the player list
+* @param plrname The name of the player to add
+*/
 void addtoPL(String36 PLName[], int rows, String36 plrname)
 {
     int processPL;
@@ -172,6 +243,13 @@ void addtoPL(String36 PLName[], int rows, String36 plrname)
     }
 }
 
+/*
+* The selectPlayers function allows the user to select players for the game, either from an existing list or by creating new players.
+* @param Playing     Array of game state structures for each player
+* @param PlayerList  Array of player structures for managing player information
+* @param PlayerNames Array of player names
+* @param players_Playing Pointer to the number of players in the game
+*/
 void selectPlayers(GameState Playing[], Player PlayerList[], String36 PlayerNames[], int *players_Playing)
 {
     int i, j;
@@ -208,7 +286,9 @@ void selectPlayers(GameState Playing[], Player PlayerList[], String36 PlayerName
 
                 if(plyrNum < 1 || plyrNum > availCount)
                 {
+                    iSetColor(I_COLOR_RED);
                     printf("Invalid player number. Please select from 1 to %d.\n", availCount);
+                    iSetColor(I_COLOR_WHITE);
                 }
                 else
                 {
@@ -299,6 +379,13 @@ void selectPlayers(GameState Playing[], Player PlayerList[], String36 PlayerName
     } 
 } 
 
+/*
+* the createNewPlayer function adds a new player to the player list with the provided name and initializes their stats.
+* @param PlayerList  Array of player structures for managing player information
+* @param PlayerNames Array of player names
+* @param max_players The maximum number of players allowed in the player list
+* @param name        The name of the new player to be created
+*/
 void createNewPlayer(Player PlayerList[], String36 PlayerNames[], int max_players, String36 name)
 {
     int i;
@@ -320,6 +407,13 @@ void createNewPlayer(Player PlayerList[], String36 PlayerNames[], int max_player
         printf("Player list full.\n");
 }
 
+/*
+* The findPlayer function searches for a player with the specified name in the player list.
+* @param PlayerList  Array of player structures for managing player information
+* @param max_players The maximum number of players allowed in the player list
+* @param name        The name of the player to search for
+* @return            The index of the player if found, otherwise -1
+*/
 int findPlayer(Player PlayerList[], int max_players, String36 name)
 {
     int i;
@@ -334,9 +428,16 @@ int findPlayer(Player PlayerList[], int max_players, String36 name)
     return index;
 }
 
+/*
+* The checkSameName function checks if a given player name is already in use by any of the players currently in the game.
+* @param List         Array of game state structures for each player in the current game
+* @param Playername   The name of the player to check for duplicates
+* @param MaxPlrGame   The maximum number of players in the game
+* @returns 1 if name is found, 0 otherwise
+*/
 int checkSameName(GameState List[], char Playername[], int MaxPlrGame)
 {
-    int processList, sameName = 0, checker = 0;
+    int processList, sameName = 0;
     for(processList = 0; processList < MaxPlrGame && sameName == 0; processList++)
     {
         if(List[processList].info != NULL && strcmp(Playername, List[processList].info->username) == 0) //added NULL since it crashes on unsigned value
@@ -348,19 +449,11 @@ int checkSameName(GameState List[], char Playername[], int MaxPlrGame)
     return sameName;
 }
 
-int usernameExists(GameState List[], int size, String36 name)
-{
-    int i;
-    int stop = 0; int exists = 0;
-    for(i = 0; i < size && stop != 1; i++){
-        if(List[i].info != NULL && strcmp(List[i].info->username, name) == 0 && stop != 1){
-            exists = 1;
-            stop = 1;
-        }
-    }
-    return exists;
-}
-
+/*
+* The displayAvailablePlayers function prints a list of all existing players in the player list along with their wins and high scores, allowing the user to choose from them when selecting players for the game.
+* @param PlayerList  Array of player structures for managing player information
+* @param max_players The maximum number of players allowed in the player list
+*/
 void displayAvailablePlayers(Player PlayerList[], int max_players)
 {
     int i;
@@ -378,6 +471,11 @@ void displayAvailablePlayers(Player PlayerList[], int max_players)
     printf("\n");
 }
 
+/*
+* The statisticsMenu function displays a menu for viewing player statistics.
+* @param settings Pointer to the game settings structure
+* @param game     Pointer to the game data structure
+*/
 void statisticsMenu(GameSettings *settings, GameData *game)
 {
     int choice = 0;
@@ -385,9 +483,9 @@ void statisticsMenu(GameSettings *settings, GameData *game)
     {
         system("cls");
         topDesign();
-        printf("[1] Top 10 MaxPlrGame based on Wins\n");
-        printf("[2] Top 10 MaxPlrGame based on Most Number of points.\n");
-        printf("[3] Exit Top 10 MaxPlrGame\n");
+        printf("[1] Top 10 Players based on Wins\n");
+        printf("[2] Top 10 Players based on Most Number of points.\n");
+        printf("[3] Exit Top 10 Players\n");
         choice = numInput();
     }
 
@@ -409,6 +507,11 @@ void statisticsMenu(GameSettings *settings, GameData *game)
     }
 }
 
+/*
+* The settingsMenu function allows the user to view and modify game settings such as the shuffle seed and winning points.
+* @param settings Pointer to the game settings structure for accessing/updating configurations
+* @param game     Pointer to the game data structure
+*/
 void settingsMenu(GameSettings* settings, GameData *game)
 {
 
@@ -429,7 +532,7 @@ void settingsMenu(GameSettings* settings, GameData *game)
         case 1:
         {
             int yn = 0;
-            printf("The default shuffle speed is %d.\n" , settings->shufflingSeed);
+            printf("The default shuffle seed is %d.\n" , settings->shufflingSeed);
             printf("Would you like to change the shuffle seed?\n");
             printf("[1] Yes\n[2] No\n");
             
@@ -449,7 +552,7 @@ void settingsMenu(GameSettings* settings, GameData *game)
             }
 
             else if(yn == 2){
-                //settings->shufflingSeed = Seed;
+                settings->shufflingSeed = randomInt(); //resets seed to a new random number to ensure different shuffle each game even if user opts to keep default
                 printf("Shuffle seed remains at default: %d\n", settings->shufflingSeed);
             }
             printf("Press Enter to continue...\n");
@@ -470,19 +573,21 @@ void settingsMenu(GameSettings* settings, GameData *game)
             if(yn == 1){
                 do
                 {
-                    //printf("Enter new winning point: ");
+                    printf("Enter new winning point: \n");
                     settings->winningPts = numInput();
                     if(settings->winningPts <= 0)
                         printf("Please enter a number above 0. \n");
                 }while(settings->winningPts <= 0);
             
-            printf("Your new shuffle speed is: %d\n", settings->winningPts);
+            printf("Your new winning point is: %d\n", settings->winningPts);
             }
 
             else if(yn == 2){
                 printf("Winning point remains at default: %d\n", settings->winningPts);
             }
-            
+            printf("Press Enter to continue...\n");
+            getchar();
+
             break;
         }
         case 3:
@@ -492,9 +597,15 @@ void settingsMenu(GameSettings* settings, GameData *game)
 }
 
 
+/*
+* The finalPlayers function allows the user to confirm the final lineup of players before starting the game.
+* @param settings Pointer to the game settings structure
+* @param game     Pointer to the game data structure
+* @param confirmed Pointer to a flag indicating whether the lineup is confirmed
+*/
 void finalPlayers(GameSettings *settings, GameData *game, int *confirmed)
 {
-    int choice = -1, choice2 = -1, displayFinal, done = 0, i;
+    int choice = -1, choice2 = -1, done = 0, i;
 
     while(done == 0)
     {
@@ -550,18 +661,43 @@ void finalPlayers(GameSettings *settings, GameData *game, int *confirmed)
 }
 
 /* II. Extra Essentials */
-void displayMainMenu()
+/*
+* The displayMainMenu function shows the main menu options to the user.
+* @param status Pointer to a string indicating the current mode (e.g., "ON" or "OFF")
+*/
+void displayMainMenu(char* status)
 { 
     printf("Main Menu\n");
     printf("[1] New Game\n");
     printf("[2] Statistics\n");
     printf("[3] Settings\n");
-    printf("[4] Exit\n");
+    printf("[4] BONUS: Toggle 2-Player Mode (currently %s)\n", status);
+    printf("[5] Exit\n");
 }
 
+/*
+* The topDesign function displays the top design elements for the game interface.
+*/
 void topDesign()
 {
+    iSetColor(I_COLOR_CYAN);
     printf("*~*~*~*~*~*~*~*~*~*~*~*~*~*~*\n");
+    iSetColor(I_COLOR_YELLOW);
     printf("-----------MANTIS------------\n");
+    iSetColor(I_COLOR_CYAN);
     printf("*~*~*~*~*~*~*~*~*~*~*~*~*~*~*\n");
+    iSetColor(I_COLOR_WHITE);
 }
+
+
+/**
+* This is to certify that this project is my/our own work, based on my/our personal
+* efforts in studying and applying the concepts learned. I/We have constructed the
+* functions and their respective algorithms and corresponding code by myself/ourselves.
+* The program was run, tested, and debugged by my/our own efforts. I/We further certify
+* that I/we have not copied in part or whole or otherwise plagiarized the work of other
+* students and/or persons, nor did I employ the use of AI in any part of the deliverable.
+*
+* <Agamata, Loraine Beatriz C.> (12507121)
+* <Lapuz, Dale Lucian M.> (12505919)
+*/
